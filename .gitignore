@@ -1,0 +1,40 @@
+# OS-specific
+.DS_Store
+
+# IDE folders
+.idea/
+.vscode/
+
+# Build output
+target/
+Reports/
+logs/
+screenshots/
+
+# Appium logs and temporary files
+appium.log
+*.tmp
+
+# Environment or secrets
+*.env
+*.properties.local
+
+# Node / Newman cache
+node_modules/
+npm-debug.log
+
+# Maven build artifacts
+*.class
+*.jar
+*.war
+*.ear
+
+# APKs — optional if large or frequently updated
+app/*.apk
+
+# Test reports
+test-output/
+extent-output/
+
+# Misc
+Thumbs.db

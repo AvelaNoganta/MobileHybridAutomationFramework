@@ -1,0 +1,2158 @@
+{
+	"info": {
+		"_postman_id": "c74d148c-9f5a-411f-ac82-4a8b076cb139",
+		"name": "Ndosi Testimonials API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20162130"
+	},
+	"item": [
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Login",
+					"item": [
+						{
+							"name": "Successful Tests",
+							"item": [
+								{
+									"name": "Login - Success",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"TC001 - User Login Response Validation\", function () {",
+													"    pm.response.to.have.status(200);",
+													"",
+													"    const jsonData = pm.response.json();",
+													"",
+													"    // Top-level assertions",
+													"    pm.expect(jsonData.success).to.eql(true);",
+													"    pm.expect(jsonData.message).to.eql(\"Login successful\");",
+													"    pm.expect(jsonData).to.have.property(\"data\");",
+													"",
+													"    // Data and user object presence",
+													"    pm.expect(jsonData.data).to.have.property(\"user\");",
+													"    pm.expect(jsonData.data).to.have.property(\"token\");",
+													"",
+													"    const user = jsonData.data.user;",
+													"    const token = jsonData.data.token;",
+													"",
+													"    // Existence (and basic shape) checks for user fields — NOT validating exact values",
+													"    pm.expect(user).to.have.property(\"id\");",
+													"    pm.expect(user.id).to.be.a(\"string\").and.not.empty;",
+													"",
+													"    pm.expect(user).to.have.property(\"firstName\");",
+													"    pm.expect(user.firstName).to.be.a(\"string\").and.not.empty;",
+													"",
+													"    pm.expect(user).to.have.property(\"lastName\");",
+													"    pm.expect(user.lastName).to.be.a(\"string\").and.not.empty;",
+													"",
+													"    pm.expect(user).to.have.property(\"email\");",
+													"    pm.expect(user.email).to.be.a(\"string\").and.not.empty;",
+													"",
+													"    pm.expect(user).to.have.property(\"createdAt\");",
+													"    pm.expect(user.createdAt).to.be.a(\"string\").and.not.empty;",
+													"",
+													"    pm.expect(user).to.have.property(\"updatedAt\");",
+													"    pm.expect(user.updatedAt).to.be.a(\"string\").and.not.empty;",
+													"",
+													"    // Token checks (existence + basic JWT shape)",
+													"    pm.expect(token).to.be.a(\"string\").and.not.empty;",
+													"    pm.expect(token.split(\".\")).to.have.length(3);",
+													"",
+													"    // Save token for subsequent requests",
+													"    pm.environment.set(\"Token\", token);",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"email\": \"{{ValidUserName}}\",\n  \"password\": \"{{ValidUserPassword}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/login",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Field Validation",
+							"item": [
+								{
+									"name": "Login - Email Required",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"",
+													"pm.test(\"TC002 - Missing Fields Response Validation (Email)\", function () {",
+													"   const jsonData = pm.response.json();",
+													"",
+													"    // Top-level assertions",
+													"    pm.expect(jsonData.success).to.eql(false);",
+													"    pm.expect(jsonData.message).to.eql(\"Email and password are required\");",
+													"    pm.expect(jsonData.error_code).to.eql(\"MISSING_CREDENTIALS\");",
+													"",
+													"    // Ensure no unexpected data/token fields are present",
+													"    pm.expect(jsonData).to.not.have.property(\"data\");",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"email\": \"\",\n  \"password\": \"FO2TVDpWRQst8hh\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/login",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Login - Password Required",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"",
+													"pm.test(\"TC003 - Missing Fields Response Validation (Password)\", function () {",
+													"      const jsonData = pm.response.json();",
+													"",
+													"    // Top-level assertions",
+													"    pm.expect(jsonData.success).to.eql(false);",
+													"    pm.expect(jsonData.message).to.eql(\"Email and password are required\");",
+													"    pm.expect(jsonData.error_code).to.eql(\"MISSING_CREDENTIALS\");",
+													"",
+													"    // Ensure no unexpected data/token fields are present",
+													"    pm.expect(jsonData).to.not.have.property(\"data\");",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"email\": \"Ernie_McLaughlin@hotmail.com\",\n  \"password\": \"\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/login",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Negative Tests",
+							"item": [
+								{
+									"name": "Login - Invalid Username and Password",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"pm.test(\"TC004 - Invalid Credentials Response Validation (username and password)\", function () {",
+													"",
+													"    const jsonData = pm.response.json();",
+													"",
+													"    // Top-level assertions (exact values)",
+													"    pm.expect(jsonData.success).to.eql(false);",
+													"    pm.expect(jsonData.message).to.eql(\"Invalid email or password\");",
+													"    pm.expect(jsonData.error_code).to.eql(\"INVALID_CREDENTIALS\");",
+													"",
+													"    // Ensure no unexpected payload like data/token",
+													"    pm.expect(jsonData).to.not.have.property(\"data\");",
+													"    pm.expect(jsonData).to.not.have.property(\"token\");",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"email\": \"{{InvaliidUsername}}\",\n  \"password\": \"{{InvalidPassword}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/login",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Login - Invalid Username",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"pm.test(\"TC05 - User Login Response Validation (username)\", function () {",
+													"",
+													"       const jsonData = pm.response.json();",
+													"",
+													"    // Top-level assertions (exact values)",
+													"    pm.expect(jsonData.success).to.eql(false);",
+													"    pm.expect(jsonData.message).to.eql(\"Invalid email or password\");",
+													"    pm.expect(jsonData.error_code).to.eql(\"INVALID_CREDENTIALS\");",
+													"",
+													"    // Ensure no unexpected payload like data/token",
+													"    pm.expect(jsonData).to.not.have.property(\"data\");",
+													"    pm.expect(jsonData).to.not.have.property(\"token\");",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"email\": \"{{InvaliidUsername}}\",\n  \"password\": \"{{ValidPassword}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/login",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Login - Invalid Password",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"pm.test(\"TC05 - User Login Response Validation (password)\", function () {",
+													"",
+													"        const jsonData = pm.response.json();",
+													"",
+													"    // Top-level assertions (exact values)",
+													"    pm.expect(jsonData.success).to.eql(false);",
+													"    pm.expect(jsonData.message).to.eql(\"Invalid email or password\");",
+													"    pm.expect(jsonData.error_code).to.eql(\"INVALID_CREDENTIALS\");",
+													"",
+													"    // Ensure no unexpected payload like data/token",
+													"    pm.expect(jsonData).to.not.have.property(\"data\");",
+													"    pm.expect(jsonData).to.not.have.property(\"token\");",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"email\": \"{{ValidUserName}}\",\n  \"password\": \"{{InvalidPassword}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/login",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Profile",
+					"item": [
+						{
+							"name": "Successful Tests",
+							"item": [
+								{
+									"name": "Get User",
+									"item": [
+										{
+											"name": "Get use Profile",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{BaseURL}}/user/profile",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"user",
+														"profile"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Update User",
+									"item": [
+										{
+											"name": "Update User",
+											"request": {
+												"method": "PUT",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/user/profile",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"user",
+														"profile"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Update User Password",
+									"item": [
+										{
+											"name": "New Request",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"// Pre-request Script",
+															"function generatePassword(length) {",
+															"    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+';",
+															"    let pwd = '';",
+															"    for (let i = 0; i < length; i++) {",
+															"        pwd += chars.charAt(Math.floor(Math.random() * chars.length));",
+															"    }",
+															"    return pwd;",
+															"}",
+															"",
+															"// Generate 16-char password",
+															"let password = generatePassword(16);",
+															"",
+															"// Store in environment variable",
+															"pm.environment.set(\"generatePassword\", password);",
+															"",
+															"// Log to console (debug only)",
+															"console.log(\"Generated password:\", password);"
+														],
+														"type": "text/javascript",
+														"packages": {},
+														"requests": {}
+													}
+												}
+											],
+											"request": {
+												"method": "PUT",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"currentPassword\": \"{{userPassword}}\",\n  \"newPassword\": \"{{generatePassword}}\",\n  \"confirmPassword\": \"{{generatePassword}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/user/password",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"user",
+														"password"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Negative Tests",
+							"item": [
+								{
+									"name": "Get user Profile - Do not exist",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{BaseURL}}/user/profile",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"user",
+												"profile"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Register",
+					"item": [
+						{
+							"name": "Successful Tests",
+							"item": [
+								{
+									"name": "Registration - Success",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 201\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test(\"TC0001 - User Registration Response Validation\", function () {",
+													"    let jsonData = pm.response.json();",
+													"",
+													"    pm.expect(jsonData.success).to.eql(true);",
+													"    pm.expect(jsonData.message).to.eql(\"User registered successfully\");",
+													"",
+													"    pm.expect(jsonData.data).to.have.property(\"Id\");",
+													"    pm.expect(jsonData.data).to.have.property(\"FirstName\");",
+													"    pm.expect(jsonData.data).to.have.property(\"LastName\");",
+													"    pm.expect(jsonData.data).to.have.property(\"Email\");",
+													"    pm.expect(jsonData.data).to.have.property(\"CreatedAt\");",
+													"    pm.expect(jsonData.data).to.have.property(\"UpdatedAt\");",
+													"    pm.expect(jsonData.data).to.have.property(\"IsActive\");",
+													"    pm.environment.set(\"ValidUserName\",jsonData.data.Email);",
+													"",
+													"",
+													"    //Field format checks",
+													"    pm.expect(jsonData.data.Id).to.match(/^[0-9a-fA-F-]{36}$/);// GUID",
+													"    pm.expect(jsonData.data.Email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/); // Emailformat",
+													"    pm.expect(jsonData.data.IsActive).to.eql(true); //Booleancheck",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"// Generate a random password using Postman's built-in dynamic variable",
+													"let pwd = pm.variables.replaceIn(\"{{$randomPassword}}\");",
+													"",
+													"",
+													"// Save it into an environment variable called \"userPassword\"",
+													"pm.environment.set(\"userPassword\", pwd);",
+													"",
+													"// Optional: log it in the Postman console (View → Show Postman Console)",
+													"console.log(\"Generated password:\", pwd);"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{userPassword}}\",\n  \"confirmPassword\": \"{{userPassword}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/register",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"register"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Field Validations",
+							"item": [
+								{
+									"name": "FirstName",
+									"item": [
+										{
+											"name": "Registration - Invalid FirstName",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 400\", function () {",
+															"    pm.response.to.have.status(400);",
+															"});",
+															"",
+															"pm.test(\"TC0002 - Invalid FirstName Validation\", function () {",
+															"    let jsonData = pm.response.json();",
+															"",
+															"});",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {},
+														"requests": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"firstName\": \"test@\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{userPassword}}\",\n  \"confirmPassword\": \"{{userPassword}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/register",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"register"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Registration - FirstName Required",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"TC0003 - Required FirstName Validation\", function () {",
+															"    let jsonData = pm.response.json();",
+															"",
+															"});",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {},
+														"requests": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"firstName\": \"\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{userPassword}}\",\n  \"confirmPassword\": \"{{userPassword}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/register",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"register"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "LastName",
+									"item": [
+										{
+											"name": "Registration - Invalid LastName",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"TC0004 - Invalid LastName Validation\", function () {",
+															"    let jsonData = pm.response.json();",
+															"",
+															"",
+															"});",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {},
+														"requests": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"L@\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{userPassword}}\",\n  \"confirmPassword\": \"{{userPassword}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/register",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"register"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Registration - LastName Required",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"TC0005 - Required LastName Validation\", function () {",
+															"    let jsonData = pm.response.json();",
+															"",
+															"});",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {},
+														"requests": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{userPassword}}\",\n  \"confirmPassword\": \"{{userPassword}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/register",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"register"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Email",
+									"item": [
+										{
+											"name": "Registration - Invalid Email",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 400\", function () {",
+															"    pm.response.to.have.status(400);",
+															"});",
+															"",
+															"pm.test(\"TC0006 - Invalid Email Validation\", function () {",
+															"  ",
+															"});",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {},
+														"requests": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"test\",\n  \"password\": \"{{userPassword}}\",\n  \"confirmPassword\": \"{{userPassword}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/register",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"register"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Registration - Email Required",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"TC0007 - Required Email Validation\", function () {",
+															"    let jsonData = pm.response.json();",
+															"",
+															"});",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {},
+														"requests": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"\",\n  \"password\": \"{{userPassword}}\",\n  \"confirmPassword\": \"{{userPassword}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/register",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"register"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Password",
+									"item": [
+										{
+											"name": "Registration - Invalid Password Length",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"TC0008 - Invalid Password Length Validation\", function () {",
+															"    let jsonData = pm.response.json();",
+															"",
+															"});",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {},
+														"requests": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"test\",\n  \"confirmPassword\": \"{{userPassword}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/register",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"register"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Registration - Password Required",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"TC0009 - Required Password Validation\", function () {",
+															"    let jsonData = pm.response.json();",
+															"",
+															"});",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {},
+														"requests": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"\",\n  \"confirmPassword\": \"{{userPassword}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/register",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"register"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Registration - Invalid Confirm Password",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 400\", function () {",
+															"    pm.response.to.have.status(400);",
+															"});",
+															"pm.test(\"TC0010 - Invalid confirmation Password Validation\", function () {",
+															"    //Expect HTTP 400",
+															"    pm.response.to.have.status(400);",
+															"",
+															"    // Parse response",
+															"    let jsonData = pm.response.json();",
+															"",
+															"    //Check top-level fields",
+															"    pm.expect(jsonData.success).to.eql(false);",
+															"    pm.expect(jsonData.message).to.eql(\"Password confirmation failed\");",
+															"",
+															"    //Check error details",
+															"    pm.expect(jsonData).to.have.property(\"error\");",
+															"    pm.expect(jsonData.error).to.eql(\"password and confirmPassword must match\");",
+															"});"
+														],
+														"type": "text/javascript",
+														"packages": {},
+														"requests": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{userPassword}}\",\n  \"confirmPassword\": \"test\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{BaseURL}}/register",
+													"host": [
+														"{{BaseURL}}"
+													],
+													"path": [
+														"register"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Negative Tests",
+							"item": [
+								{
+									"name": "Registration - Existing User",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 409\", function () {",
+													"    // Check that the response status code is 409",
+													"    pm.response.to.have.status(409);",
+													"});",
+													"",
+													"pm.test(\"TC04 - Duplicate User Registration Error\", function () {",
+													"    // Expect HTTP 409 Conflict",
+													"    pm.response.to.have.status(409);",
+													"",
+													"    // Parse response",
+													"    let jsonData = pm.response.json();",
+													"",
+													"    // Top-level fields",
+													"    pm.expect(jsonData.success).to.eql(false); // Correcting the expectation for success",
+													"    pm.expect(jsonData.message).to.eql(\"User already exists\"); // Expecting an empty message",
+													"",
+													"    // Error details",
+													"    pm.expect(jsonData).to.have.property(\"error\");",
+													"    pm.expect(jsonData.error).to.eql(\"A user with this email address already exists\"); // Expecting an empty error message",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"Lexus.Mitchell@yahoo.com\",\n  \"password\": \"{{userPassword}}\",\n  \"confirmPassword\": \"{{userPassword}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/auth/register",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"auth",
+												"register"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{Token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Testimonials",
+			"item": [
+				{
+					"name": "Get Testimonials",
+					"item": [
+						{
+							"name": "Get All Testimonials",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"TC06 - Testimonials Retrieval Response Validation\", function () {",
+											"",
+											"    let jsonData = pm.response.json();",
+											"",
+											"    pm.expect(jsonData.success).to.eql(true);",
+											"    pm.expect(jsonData.message).to.eql(\"Testimonials retrieved successfully\");",
+											"    pm.expect(jsonData).to.have.property(\"data\");",
+											"",
+											"    pm.expect(jsonData.data).to.have.property(\"testimonials\");",
+											"    pm.expect(jsonData.data.testimonials).to.be.an(\"array\").that.is.not.empty;",
+											"",
+											"    let first = jsonData.data.testimonials[0];",
+											"    pm.expect(first).to.have.property(\"id\").that.match(/^[0-9A-F-]{36}$/i); // GUID",
+											"    pm.expect(first).to.have.property(\"userId\").that.match(/^[0-9A-F-]{36}$/i);",
+											"    pm.expect(first).to.have.property(\"title\").that.is.a(\"string\");",
+											"    pm.expect(first).to.have.property(\"content\").that.is.a(\"string\");",
+											"    pm.expect(first).to.have.property(\"rating\").that.is.a(\"number\");",
+											"    pm.expect(first.rating).to.be.within(1, 5); // ⭐ rating between 1–5",
+											"    pm.expect(first).to.have.property(\"isPublic\").that.is.a(\"boolean\");",
+											"    pm.expect(first).to.have.property(\"createdAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+											"    pm.expect(first).to.have.property(\"updatedAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+											"",
+											"    pm.expect(first).to.have.property(\"user\");",
+											"    pm.expect(first.user).to.have.property(\"firstName\").that.is.a(\"string\");",
+											"    pm.expect(first.user).to.have.property(\"lastName\").that.is.a(\"string\");",
+											"",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BaseURL}}/testimonials",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"testimonials"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Testimonials - Pages",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"TC06 - Testimonials Retrieval Response Validation\", function () {",
+											"",
+											"    let jsonData = pm.response.json();",
+											"",
+											"    pm.expect(jsonData.success).to.eql(true);",
+											"    pm.expect(jsonData.message).to.eql(\"Testimonials retrieved successfully\");",
+											"    pm.expect(jsonData).to.have.property(\"data\");",
+											"",
+											"    pm.expect(jsonData.data).to.have.property(\"testimonials\");",
+											"    pm.expect(jsonData.data.testimonials).to.be.an(\"array\").that.is.not.empty;",
+											"",
+											"    let first = jsonData.data.testimonials[0];",
+											"    pm.expect(first).to.have.property(\"id\").that.match(/^[0-9A-F-]{36}$/i); // GUID",
+											"    pm.expect(first).to.have.property(\"userId\").that.match(/^[0-9A-F-]{36}$/i);",
+											"    pm.expect(first).to.have.property(\"title\").that.is.a(\"string\");",
+											"    pm.expect(first).to.have.property(\"content\").that.is.a(\"string\");",
+											"    pm.expect(first).to.have.property(\"rating\").that.is.a(\"number\");",
+											"    pm.expect(first.rating).to.be.within(1, 5); // ⭐ rating between 1–5",
+											"    pm.expect(first).to.have.property(\"isPublic\").that.is.a(\"boolean\");",
+											"    pm.expect(first).to.have.property(\"createdAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+											"    pm.expect(first).to.have.property(\"updatedAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+											"",
+											"    pm.expect(first).to.have.property(\"user\");",
+											"    pm.expect(first.user).to.have.property(\"firstName\").that.is.a(\"string\");",
+											"    pm.expect(first.user).to.have.property(\"lastName\").that.is.a(\"string\");",
+											"",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BaseURL}}/testimonials?page=1",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"testimonials"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Testimonials - Limit",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"TC06 - Testimonials Retrieval Response Validation\", function () {",
+											"",
+											"    let jsonData = pm.response.json();",
+											"",
+											"    pm.expect(jsonData.success).to.eql(true);",
+											"    pm.expect(jsonData.message).to.eql(\"Testimonials retrieved successfully\");",
+											"    pm.expect(jsonData).to.have.property(\"data\");",
+											"",
+											"    pm.expect(jsonData.data).to.have.property(\"testimonials\");",
+											"    pm.expect(jsonData.data.testimonials).to.be.an(\"array\").that.is.not.empty;",
+											"",
+											"    let first = jsonData.data.testimonials[0];",
+											"    pm.expect(first).to.have.property(\"id\").that.match(/^[0-9A-F-]{36}$/i); // GUID",
+											"    pm.expect(first).to.have.property(\"userId\").that.match(/^[0-9A-F-]{36}$/i);",
+											"    pm.expect(first).to.have.property(\"title\").that.is.a(\"string\");",
+											"    pm.expect(first).to.have.property(\"content\").that.is.a(\"string\");",
+											"    pm.expect(first).to.have.property(\"rating\").that.is.a(\"number\");",
+											"    pm.expect(first.rating).to.be.within(1, 5); // ⭐ rating between 1–5",
+											"    pm.expect(first).to.have.property(\"isPublic\").that.is.a(\"boolean\");",
+											"    pm.expect(first).to.have.property(\"createdAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+											"    pm.expect(first).to.have.property(\"updatedAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+											"",
+											"    pm.expect(first).to.have.property(\"user\");",
+											"    pm.expect(first.user).to.have.property(\"firstName\").that.is.a(\"string\");",
+											"    pm.expect(first.user).to.have.property(\"lastName\").that.is.a(\"string\");",
+											"",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BaseURL}}/testimonials?limit=1",
+									"host": [
+										"{{BaseURL}}"
+									],
+									"path": [
+										"testimonials"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Successful Tests",
+					"item": [
+						{
+							"name": "Post Testimonials",
+							"item": [
+								{
+									"name": "Post a Testimonial",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 201\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test(\"TC06 - Testimonial Creation Response Validation\", function () {",
+													"    let jsonData = pm.response.json();",
+													"",
+													"    pm.expect(jsonData.success).to.eql(true);",
+													"    pm.expect(jsonData.message).to.eql(\"Testimonial created successfully\");",
+													"    pm.expect(jsonData).to.have.property(\"data\");",
+													"",
+													"    let testimonial = jsonData.data;",
+													"",
+													"    pm.expect(testimonial).to.have.property(\"id\").that.match(/^[0-9A-F-]{36}$/i); // GUID",
+													"    pm.expect(testimonial).to.have.property(\"userId\").that.match(/^[0-9A-F-]{36}$/i);",
+													"    pm.expect(testimonial).to.have.property(\"title\").that.is.a(\"string\");",
+													"    pm.expect(testimonial).to.have.property(\"content\").that.is.a(\"string\");",
+													"    pm.expect(testimonial).to.have.property(\"rating\").that.is.a(\"number\");",
+													"    pm.expect(testimonial.rating).to.be.within(1, 5); //rating between 1–5",
+													"    pm.expect(testimonial).to.have.property(\"isPublic\").that.is.a(\"boolean\");",
+													"    pm.expect(testimonial).to.have.property(\"createdAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+													"    pm.expect(testimonial).to.have.property(\"updatedAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+													"",
+													"    pm.expect(testimonial).to.have.property(\"user\");",
+													"    pm.expect(testimonial.user).to.have.property(\"firstName\").that.is.a(\"string\");",
+													"    pm.expect(testimonial.user).to.have.property(\"lastName\").that.is.a(\"string\");",
+													"    pm.environment.set(\"Id\", jsonData.data.id);",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{Token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"Informative Classes\",\n  \"content\": \"I recommend Ndosi\",\n  \"rating\": 5,\n  \"isPublic\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Post a Testimonial - isPublic false",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 201\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test(\"TC06 - Testimonial Creation Response Validation\", function () {",
+													"    let jsonData = pm.response.json();",
+													"",
+													"    pm.expect(jsonData.success).to.eql(true);",
+													"    pm.expect(jsonData.message).to.eql(\"Testimonial created successfully\");",
+													"    pm.expect(jsonData).to.have.property(\"data\");",
+													"",
+													"    let testimonial = jsonData.data;",
+													"",
+													"    pm.expect(testimonial).to.have.property(\"id\").that.match(/^[0-9A-F-]{36}$/i); // GUID",
+													"    pm.expect(testimonial).to.have.property(\"userId\").that.match(/^[0-9A-F-]{36}$/i);",
+													"    pm.expect(testimonial).to.have.property(\"title\").that.is.a(\"string\");",
+													"    pm.expect(testimonial).to.have.property(\"content\").that.is.a(\"string\");",
+													"    pm.expect(testimonial).to.have.property(\"rating\").that.is.a(\"number\");",
+													"    pm.expect(testimonial.rating).to.be.within(1, 5); //rating between 1–5",
+													"    pm.expect(testimonial).to.have.property(\"isPublic\").that.is.a(\"boolean\");",
+													"    pm.expect(testimonial).to.have.property(\"createdAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+													"    pm.expect(testimonial).to.have.property(\"updatedAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+													"",
+													"    pm.expect(testimonial).to.have.property(\"user\");",
+													"    pm.expect(testimonial.user).to.have.property(\"firstName\").that.is.a(\"string\");",
+													"    pm.expect(testimonial.user).to.have.property(\"lastName\").that.is.a(\"string\");",
+													"    pm.environment.set(\"id\", jsonData.data.id);",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{Token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"Informative Classes\",\n  \"content\": \"I recommend Ndosi\",\n  \"rating\": 5,\n  \"isPublic\": false\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Update Testimonials",
+							"item": [
+								{
+									"name": "Update Testimonial",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"Informative Classes Updated\",\n  \"content\": \"I recommend Ndosi Updated\",\n  \"rating\": 4,\n  \"isPublic\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials/{{Id}}",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials",
+												"{{Id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Delete Testimonial",
+							"item": [
+								{
+									"name": "Delete Testimonial",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{BaseURL}}/testimonials/{{Id}}",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials",
+												"{{Id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Negative Tests",
+					"item": [
+						{
+							"name": "Post Testimonials",
+							"item": [
+								{
+									"name": "Post a Testimonial - Authentication Required",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"",
+													"pm.test(\"TC07 - 401 Unauthorized Response Validation\", function () {",
+													"    let jsonData = pm.response.json();",
+													"",
+													"    pm.expect(jsonData.success).to.eql(false);",
+													"    pm.expect(jsonData.message).to.eql(\"Authentication required\");",
+													"    pm.expect(jsonData).to.have.property(\"error\").that.eql(\"No token provided\");",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"Informative Classes\",\n  \"content\": \"I recommend Ndosi\",\n  \"rating\": 5,\n  \"isPublic\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Update Testimonials",
+							"item": [
+								{
+									"name": "Update Testimonial - Testimonial not found",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"Informative Classes Updated\",\n  \"content\": \"I recommend Ndosi Updated\",\n  \"rating\": 4,\n  \"isPublic\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials/{{invalidId}}",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials",
+												"{{invalidId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Delete Testimonials",
+							"item": [
+								{
+									"name": "Delete Testimonial - Testimonial Not Found",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{BaseURL}}/testimonials/{{invalidId}}",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials",
+												"{{invalidId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Get My Testimonials",
+					"item": [
+						{
+							"name": "Successful Tests",
+							"item": [
+								{
+									"name": "Get My Testimonials",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"TC06 - Testimonials Retrieval Response Validation\", function () {",
+													"",
+													"    let jsonData = pm.response.json();",
+													"",
+													"    pm.expect(jsonData.success).to.eql(true);",
+													"    pm.expect(jsonData.message).to.eql(\"Testimonials retrieved successfully\");",
+													"    pm.expect(jsonData).to.have.property(\"data\");",
+													"",
+													"    pm.expect(jsonData.data).to.have.property(\"testimonials\");",
+													"    pm.expect(jsonData.data.testimonials).to.be.an(\"array\").that.is.not.empty;",
+													"",
+													"    let first = jsonData.data.testimonials[0];",
+													"    pm.expect(first).to.have.property(\"id\").that.match(/^[0-9A-F-]{36}$/i); // GUID",
+													"    pm.expect(first).to.have.property(\"userId\").that.match(/^[0-9A-F-]{36}$/i);",
+													"    pm.expect(first).to.have.property(\"title\").that.is.a(\"string\");",
+													"    pm.expect(first).to.have.property(\"content\").that.is.a(\"string\");",
+													"    pm.expect(first).to.have.property(\"rating\").that.is.a(\"number\");",
+													"    pm.expect(first.rating).to.be.within(1, 5); // ⭐ rating between 1–5",
+													"    pm.expect(first).to.have.property(\"isPublic\").that.is.a(\"boolean\");",
+													"    pm.expect(first).to.have.property(\"createdAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+													"    pm.expect(first).to.have.property(\"updatedAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+													"",
+													"    pm.expect(first).to.have.property(\"user\");",
+													"    pm.expect(first.user).to.have.property(\"firstName\").that.is.a(\"string\");",
+													"    pm.expect(first.user).to.have.property(\"lastName\").that.is.a(\"string\");",
+													"",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{BaseURL}}/testimonials/my",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials",
+												"my"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Negative Tests",
+							"item": [
+								{
+									"name": "Get My Testimonials - Missing ID",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"TC06 - Testimonials Retrieval Response Validation\", function () {",
+													"",
+													"    let jsonData = pm.response.json();",
+													"",
+													"    pm.expect(jsonData.success).to.eql(true);",
+													"    pm.expect(jsonData.message).to.eql(\"Testimonials retrieved successfully\");",
+													"    pm.expect(jsonData).to.have.property(\"data\");",
+													"",
+													"    pm.expect(jsonData.data).to.have.property(\"testimonials\");",
+													"    pm.expect(jsonData.data.testimonials).to.be.an(\"array\").that.is.not.empty;",
+													"",
+													"    let first = jsonData.data.testimonials[0];",
+													"    pm.expect(first).to.have.property(\"id\").that.match(/^[0-9A-F-]{36}$/i); // GUID",
+													"    pm.expect(first).to.have.property(\"userId\").that.match(/^[0-9A-F-]{36}$/i);",
+													"    pm.expect(first).to.have.property(\"title\").that.is.a(\"string\");",
+													"    pm.expect(first).to.have.property(\"content\").that.is.a(\"string\");",
+													"    pm.expect(first).to.have.property(\"rating\").that.is.a(\"number\");",
+													"    pm.expect(first.rating).to.be.within(1, 5); // ⭐ rating between 1–5",
+													"    pm.expect(first).to.have.property(\"isPublic\").that.is.a(\"boolean\");",
+													"    pm.expect(first).to.have.property(\"createdAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+													"    pm.expect(first).to.have.property(\"updatedAt\").that.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/);",
+													"",
+													"    pm.expect(first).to.have.property(\"user\");",
+													"    pm.expect(first.user).to.have.property(\"firstName\").that.is.a(\"string\");",
+													"    pm.expect(first.user).to.have.property(\"lastName\").that.is.a(\"string\");",
+													"",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{BaseURL}}/testimonials",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Field Validations",
+					"item": [
+						{
+							"name": "Update Testimonials",
+							"item": [
+								{
+									"name": "Update Testimonial - Missing Title",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"\",\n  \"content\": \"I recommend Ndosi Updated\",\n  \"rating\": 4,\n  \"isPublic\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials/{{id}}",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Testimonial - Missing Content",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"Informative Classes Updated\",\n  \"content\": \"\",\n  \"rating\": 4,\n  \"isPublic\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials/{{id}}",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Testimonial - Invalid Rating",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"Informative Classes Updated\",\n  \"content\": \"I recommend Ndosi Updated\",\n  \"rating\": 78,\n  \"isPublic\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials/{{id}}",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Post Testimonials",
+							"item": [
+								{
+									"name": "Post a Testimonial - Invalid Rating",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"TC10 - Invalid Rating Error Response Validation\", function () {",
+													"    let jsonData = pm.response.json();",
+													"",
+													"    pm.expect(jsonData.success).to.eql(false);",
+													"    pm.expect(jsonData.message).to.eql(\"Invalid rating\");",
+													"    pm.expect(jsonData.error).to.eql(\"rating must be between 1 and 5\");",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{Token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"Informative Classes\",\n  \"content\": \"I recommend Ndosi\",\n  \"rating\": 15,\n  \"isPublic\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Post a Testimonial - Missing Title",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"TC11 - Missing Title, Content, and Rating Validation\", function () {",
+													"    let jsonData = pm.response.json();",
+													"",
+													"    pm.expect(jsonData.success).to.eql(false);",
+													"    pm.expect(jsonData.message).to.eql(\"Missing required fields\");",
+													"    pm.expect(jsonData.error).to.eql(\"title, content, and rating are required\");",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{Token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"\",\n  \"content\": \"I recommend Ndosi\",\n  \"rating\": 5,\n  \"isPublic\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Post a Testimonial - Missing Content",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"TC11 - Missing Title, Content, and Rating Validation\", function () {",
+													"    let jsonData = pm.response.json();",
+													"",
+													"    pm.expect(jsonData.success).to.eql(false);",
+													"    pm.expect(jsonData.message).to.eql(\"Missing required fields\");",
+													"    pm.expect(jsonData.error).to.eql(\"title, content, and rating are required\");",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{Token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"title\": \"Informative Classes\",\n  \"content\": \"\",\n  \"rating\": 5,\n  \"isPublic\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseURL}}/testimonials",
+											"host": [
+												"{{BaseURL}}"
+											],
+											"path": [
+												"testimonials"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
