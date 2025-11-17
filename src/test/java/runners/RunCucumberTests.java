@@ -9,14 +9,15 @@ import java.io.IOException;
 import java.util.Properties;
 
 @CucumberOptions(
-        features = "src/test/resources/features/mobileWeb/registrationWeb.feature",
+        features = "src/test/resources/features/",
         glue = {"stepdefinitions"},
         plugin = {
                 "pretty",
                 "html:Reports/CucumberReport.html",
                 "summary"
         },
-        monochrome = true
+        monochrome = true,
+        tags =" @mobileWeb or @login or @mobileWeb or @registration or @nativeApp"
 )
 public class RunCucumberTests extends AbstractTestNGCucumberTests {
 
@@ -32,7 +33,7 @@ public class RunCucumberTests extends AbstractTestNGCucumberTests {
             default -> "src/test/resources/features";
         };
         System.setProperty("cucumber.features", featurePath);
-        System.out.println("🧩 Running features from: " + featurePath);
+        System.out.println("Running features from: " + featurePath);
     }
 
     @DataProvider(parallel = false)

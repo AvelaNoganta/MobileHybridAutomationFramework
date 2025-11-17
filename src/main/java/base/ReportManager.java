@@ -12,7 +12,7 @@ public class ReportManager {
     private static ExtentReports extent;
     private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
 
-    // ✅ Ensure report always exists before use
+    //Ensure report always exists before use
     public static void initReports() {
         if (extent == null) {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -27,7 +27,7 @@ public class ReportManager {
     }
 
     public static void createTest(String testName) {
-        initReports(); // ✅ Ensure extent is never null
+        initReports(); //Ensure extent is never null
         ExtentTest extentTest = extent.createTest(testName);
         test.set(extentTest);
     }
@@ -39,7 +39,7 @@ public class ReportManager {
     public static void flushReports() {
         if (extent != null) {
             extent.flush();
-            System.out.println("✅ ExtentReports flushed to file.");
+            System.out.println("ExtentReports flushed to file.");
         }
     }
 }

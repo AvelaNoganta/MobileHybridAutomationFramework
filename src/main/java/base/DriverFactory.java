@@ -11,7 +11,7 @@ public class DriverFactory {
     private static AndroidDriver driver;
 
     public static void initDriver(Properties config) throws MalformedURLException {
-        if (driver != null) return;  // ✅ Prevent double initialization
+        if (driver != null) return;  //Prevent double initialization
 
         String execType = config.getProperty("executionType").trim();
         UiAutomator2Options options = new UiAutomator2Options()
@@ -21,11 +21,11 @@ public class DriverFactory {
 
         if (execType.equalsIgnoreCase("mobileWeb")) {
             options.withBrowserName("Chrome");
-            System.out.println("✅ Launching Chrome browser...");
+            System.out.println("Launching Chrome browser...");
         } else if (execType.equalsIgnoreCase("nativeApp")) {
             String appPath = System.getProperty("user.dir") + "/" + config.getProperty("appPath");
             options.setApp(appPath);
-            System.out.println("✅ Launching native app: " + appPath);
+            System.out.println("Launching native app: " + appPath);
         }
 
         driver = new AndroidDriver(new URL(config.getProperty("appiumServer")), options);
