@@ -82,4 +82,5 @@ jobs:
         with:
           name: ExtentReport
           path: Reports/
+          if-no-files-found: warn
 
