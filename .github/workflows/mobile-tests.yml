@@ -1,39 +1,32 @@
 name: Mobile Hybrid Automation
 
-# -----------------------------
-# 🧩 TRIGGERS
-# -----------------------------
 on:
-  push:                     # ⬅️ Runs on every push
+  push:
     branches: [ "main" ]
-
-  pull_request:             # ⬅️ Runs on PRs (optional)
+  pull_request:
     branches: [ "main" ]
-
-  schedule:                 # ⬅️ Runs daily at 02:00 SAST
-    - cron: "0 0 * * *"     # 02:00 SAST = 00:00 UTC
-
-  workflow_dispatch:        # ⬅️ Manual trigger
-# -----------------------------
+  schedule:
+    - cron: "0 0 * * *"   # 02:00 SAST
+  workflow_dispatch:
 
 jobs:
   run-tests:
-    runs-on: macos-latest  # Required for Android emulator + Appium
+    runs-on: macos-latest
 
     steps:
-      # Checkout repo
+      # Checkout
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Install Java
+      # Java Setup
       - name: Setup Java
-        uses: actions/upload-artifact@v4
+        uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "17"
+          distribution: temurin
+          java-version: 17
 
-      # Install node + newman
-      - name: Install Node
+      # Node + Newman
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: "18"
@@ -47,13 +40,12 @@ jobs:
           npm install -g appium
           appium -v
 
-      # Install Appium drivers
       - name: Install Appium Drivers
         run: |
           appium driver install uiautomator2
           appium driver install chromium
 
-      # Install Android SDK
+      # Android SDK
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
@@ -76,11 +68,9 @@ jobs:
       - name: Run Cucumber Tests
         run: mvn clean test -Dcucumber.filter.tags="@mobileWeb"
 
-      # Upload Extent Report
+      # Upload ExtentReport folder
       - name: Upload Extent Report
         uses: actions/upload-artifact@v4
         with:
           name: ExtentReport
           path: Reports/
-          if-no-files-found: warn
-
