@@ -1,0 +1,84 @@
+name: Mobile Hybrid Automation
+
+# -----------------------------
+# 🧩 TRIGGERS
+# -----------------------------
+on:
+  push:                     # ⬅️ Runs on every push
+    branches: [ "main" ]
+
+  pull_request:             # ⬅️ Runs on PRs (optional)
+    branches: [ "main" ]
+
+  schedule:                 # ⬅️ Runs daily at 02:00 SAST
+    - cron: "0 0 * * *"     # 02:00 SAST = 00:00 UTC
+
+  workflow_dispatch:        # ⬅️ Manual trigger
+# -----------------------------
+
+jobs:
+  run-tests:
+    runs-on: macos-latest  # Required for Android emulator + Appium
+
+    steps:
+      # Checkout repo
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Install Java
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      # Install node + newman
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      # Install Appium
+      - name: Install Appium
+        run: |
+          npm install -g appium
+          appium -v
+
+      # Install Appium drivers
+      - name: Install Appium Drivers
+        run: |
+          appium driver install uiautomator2
+          appium driver install chromium
+
+      # Install Android SDK
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # Create and start emulator
+      - name: Create Emulator
+        run: |
+          echo "no" | avdmanager create avd -n test-avd -k "system-images;android-30;google_apis;x86_64"
+          nohup emulator -avd test-avd -no-snapshot -no-window -noaudio &
+          adb wait-for-device
+          sleep 25
+          adb shell input keyevent 82
+
+      # Start Appium server
+      - name: Start Appium Server
+        run: |
+          nohup appium --allow-insecure chromedriver_autodownload &
+          sleep 10
+
+      # Run Maven Tests
+      - name: Run Cucumber Tests
+        run: mvn clean test -Dcucumber.filter.tags="@mobileWeb"
+
+      # Upload Reports
+      - name: Upload Extent Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: ExtentReport
+          path: Reports/
