@@ -22,13 +22,10 @@ public class HomePage {
     @FindBy(id = "signup-toggle")
     private WebElement signupButton;
 
-
-
     public HomePage(WebDriver driver) {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         PageFactory.initElements(driver, this);
     }
-
     public void clickPractice() {
         wait.until(ExpectedConditions.elementToBeClickable(practiceButton)).click();
     }

@@ -10,6 +10,7 @@ target/
 Reports/
 logs/
 screenshots/
+.ai-code-tracking.json
 
 # Appium logs and temporary files
 appium.log

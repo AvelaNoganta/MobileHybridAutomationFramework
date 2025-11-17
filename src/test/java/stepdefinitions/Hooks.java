@@ -18,7 +18,7 @@ public class Hooks {
         config = new Properties();
         config.load(new FileInputStream("src/test/resources/config.properties"));
 
-        // ✅ Always ensure report exists
+        //Always ensure report exists
         ReportManager.initReports();
         ReportManager.createTest(scenario.getName());
 
@@ -26,7 +26,7 @@ public class Hooks {
         if (!execType.equalsIgnoreCase("api")) {
             DriverFactory.initDriver(config);
         } else {
-            System.out.println("✅ API mode – skipping Appium driver startup.");
+            System.out.println("API mode – skipping Appium driver startup.");
         }
 
     }
@@ -34,9 +34,9 @@ public class Hooks {
     @After
     public void after(Scenario scenario) {
         if (scenario.isFailed()) {
-            ReportManager.getTest().fail("❌ Scenario failed: " + scenario.getName());
+            ReportManager.getTest().fail("Scenario failed: " + scenario.getName());
         } else {
-            ReportManager.getTest().pass("✅ Scenario passed: " + scenario.getName());
+            ReportManager.getTest().pass("Scenario passed: " + scenario.getName());
         }
 
         DriverFactory.quitDriver();
