@@ -27,7 +27,7 @@ jobs:
 
       # Install Java
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/upload-artifact@v4
         with:
           distribution: "temurin"
           java-version: "17"
@@ -76,9 +76,10 @@ jobs:
       - name: Run Cucumber Tests
         run: mvn clean test -Dcucumber.filter.tags="@mobileWeb"
 
-      # Upload Reports
+      # Upload Extent Report
       - name: Upload Extent Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ExtentReport
           path: Reports/
+
