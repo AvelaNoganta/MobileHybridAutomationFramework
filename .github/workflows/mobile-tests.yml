@@ -46,12 +46,22 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      # Install system image
+      - name: Install Android system image
+        run: |
+          yes | sdkmanager --install "system-images;android-30;google_apis;x86_64"
+
+      # Create emulator
       - name: Create Emulator
         run: |
           echo "no" | avdmanager create avd -n test-avd -k "system-images;android-30;google_apis;x86_64"
+
+      # Start emulator
+      - name: Start Emulator
+        run: |
           nohup emulator -avd test-avd -no-snapshot -no-window -noaudio &
           adb wait-for-device
-          sleep 25
+          sleep 30
           adb shell input keyevent 82
 
       - name: Start Appium Server
