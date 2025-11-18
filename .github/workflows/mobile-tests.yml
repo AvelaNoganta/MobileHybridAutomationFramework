@@ -31,11 +31,13 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
+      # Install Appium 3.x
       - name: Install Appium
         run: |
           npm install -g appium@next
           appium -v
 
+      # Install Appium Drivers
       - name: Install Appium Drivers
         run: |
           appium driver install uiautomator2
