@@ -6,12 +6,12 @@ on:
   pull_request:
     branches: ["main"]
   schedule:
-    - cron: "0 0 * * *"   # 02:00 SAST
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 jobs:
   run-tests:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
@@ -37,55 +37,50 @@ jobs:
           npm install -g appium@next
           appium -v
 
-      # Install Appium Drivers
+      # Install Appium drivers
       - name: Install Appium Drivers
         run: |
           appium driver install uiautomator2
           appium driver install chromium
 
-      # Install Android SDK and components
+      # Install Android SDK
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept licenses
+      - name: Accept Licenses
         run: yes | sdkmanager --licenses
 
-      - name: Install Android SDK tools
+      # Install emulator + system image (Ubuntu supports ARM)
+      - name: Install Emulator & System Image
         run: |
-          yes | sdkmanager "platform-tools" "platforms;android-30" "tools" "emulator"
+          yes | sdkmanager "emulator"
+          yes | sdkmanager "platform-tools" "platforms;android-30"
+          yes | sdkmanager "system-images;android-30;google_apis_playstore;arm64-v8a"
 
-      # Install playable system image (VALID IN 2025)
-      - name: Install Android system image
-        run: |
-          yes | sdkmanager --install "system-images;android-30;google_apis_playstore;x86_64"
-
-      # Create emulator using the installed & valid system image
-      - name: Create Emulator
+      # Create AVD
+      - name: Create AVD
         run: |
           echo "no" | avdmanager create avd \
             -n test-avd \
-            -k "system-images;android-30;google_apis_playstore;x86_64" \
+            -k "system-images;android-30;google_apis_playstore;arm64-v8a" \
             --device "pixel"
 
-      # Boot emulator
+      # Start emulator headlessly on Ubuntu
       - name: Start Emulator
         run: |
-          nohup emulator -avd test-avd -no-snapshot -no-window -noaudio -gpu swiftshader_indirect &
+          nohup emulator -avd test-avd -no-snapshot -noaudio -no-window -gpu swiftshader_indirect -qemu -m 2048 &
           adb wait-for-device
-          sleep 35
+          sleep 40
           adb shell input keyevent 82
 
-      # Start Appium Server
       - name: Start Appium Server
         run: |
           nohup appium --allow-insecure chromedriver_autodownload &
           sleep 10
 
-      # Run Maven Cucumber Tests
       - name: Run Cucumber Tests
         run: mvn clean test -Dcucumber.filter.tags="@mobileWeb"
 
-      # Upload Extent Report
       - name: Upload Extent Report
         uses: actions/upload-artifact@v4
         with:
