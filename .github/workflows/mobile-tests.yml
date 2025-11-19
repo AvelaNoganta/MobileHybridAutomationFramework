@@ -43,35 +43,49 @@ jobs:
           appium driver install uiautomator2
           appium driver install chromium
 
+      # Install Android SDK and components
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # Install system image
+      - name: Accept licenses
+        run: yes | sdkmanager --licenses
+
+      - name: Install Android SDK tools
+        run: |
+          yes | sdkmanager "platform-tools" "platforms;android-30" "tools" "emulator"
+
+      # Install playable system image (VALID IN 2025)
       - name: Install Android system image
         run: |
-          yes | sdkmanager --install "system-images;android-30;google_apis;x86_64"
+          yes | sdkmanager --install "system-images;android-30;google_apis_playstore;x86_64"
 
-      # Create emulator
+      # Create emulator using the installed & valid system image
       - name: Create Emulator
         run: |
-          echo "no" | avdmanager create avd -n test-avd -k "system-images;android-30;google_apis;x86_64"
+          echo "no" | avdmanager create avd \
+            -n test-avd \
+            -k "system-images;android-30;google_apis_playstore;x86_64" \
+            --device "pixel"
 
-      # Start emulator
+      # Boot emulator
       - name: Start Emulator
         run: |
-          nohup emulator -avd test-avd -no-snapshot -no-window -noaudio &
+          nohup emulator -avd test-avd -no-snapshot -no-window -noaudio -gpu swiftshader_indirect &
           adb wait-for-device
-          sleep 30
+          sleep 35
           adb shell input keyevent 82
 
+      # Start Appium Server
       - name: Start Appium Server
         run: |
           nohup appium --allow-insecure chromedriver_autodownload &
           sleep 10
 
+      # Run Maven Cucumber Tests
       - name: Run Cucumber Tests
         run: mvn clean test -Dcucumber.filter.tags="@mobileWeb"
 
+      # Upload Extent Report
       - name: Upload Extent Report
         uses: actions/upload-artifact@v4
         with:
