@@ -6,23 +6,32 @@ on:
   pull_request:
     branches: ["main"]
   schedule:
-    - cron: "0 0 * * *"   # 02:00 SAST
+    - cron: "0 0 * * *"   # Runs daily at midnight UTC (02:00 SAST)
   workflow_dispatch:
 
 jobs:
   run-tests:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
+      # -----------------------
+      # CHECKOUT SOURCE CODE
+      # -----------------------
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # -----------------------
+      # JAVA
+      # -----------------------
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
+      # -----------------------
+      # NODE + NEWMAN (optional)
+      # -----------------------
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -31,37 +40,89 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
-      # Install Appium 3.x
+      # -----------------------
+      # APPIUM 3.x
+      # -----------------------
       - name: Install Appium
         run: |
           npm install -g appium@next
           appium -v
 
-      # Install Appium Drivers
       - name: Install Appium Drivers
         run: |
           appium driver install uiautomator2
           appium driver install chromium
 
+      # -----------------------
+      # ANDROID SDK PREP
+      # -----------------------
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Create Emulator
-        run: |
-          echo "no" | avdmanager create avd -n test-avd -k "system-images;android-30;google_apis;x86_64"
-          nohup emulator -avd test-avd -no-snapshot -no-window -noaudio &
-          adb wait-for-device
-          sleep 25
-          adb shell input keyevent 82
+      - name: Accept Android Licenses
+        run: yes | sdkmanager --licenses
 
+      - name: Install Android Tools & Platform
+        run: |
+          yes | sdkmanager "platform-tools" "platforms;android-30" "tools"
+
+      # -----------------------
+      # INSTALL EMULATOR BINARIES
+      # -----------------------
+      - name: Install Emulator Tools
+        run: |
+          yes | sdkmanager "emulator"
+
+      # Required! Makes "emulator" command available
+      - name: Add Emulator to PATH
+        run: echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
+
+      # -----------------------
+      # INSTALL SYSTEM IMAGE (VALID IN 2025)
+      # -----------------------
+      - name: Install Android System Image
+        run: |
+          yes | sdkmanager --install "system-images;android-30;google_apis_playstore;arm64-v8a"
+
+      # -----------------------
+      # CREATE EMULATOR
+      # -----------------------
+      - name: Create AVD
+        run: |
+          echo "no" | avdmanager create avd \
+            -n test-avd \
+            -k "system-images;android-30;google_apis_playstore;arm64-v8a" \
+            --device "pixel"
+
+      # -----------------------
+      # START EMULATOR (HEADLESS)
+      # -----------------------
+      - name: Start Emulator
+        run: |
+          nohup emulator -avd test-avd -no-snapshot -noaudio -no-window \
+            -gpu swiftshader_indirect -qemu -m 2048 &
+
+          adb wait-for-device
+          sleep 40
+          adb shell input keyevent 82  # Unlock screen
+
+      # -----------------------
+      # START APPIUM SERVER
+      # -----------------------
       - name: Start Appium Server
         run: |
           nohup appium --allow-insecure chromedriver_autodownload &
           sleep 10
 
+      # -----------------------
+      # RUN TESTS
+      # -----------------------
       - name: Run Cucumber Tests
         run: mvn clean test -Dcucumber.filter.tags="@mobileWeb"
 
+      # -----------------------
+      # UPLOAD REPORT
+      # -----------------------
       - name: Upload Extent Report
         uses: actions/upload-artifact@v4
         with:
