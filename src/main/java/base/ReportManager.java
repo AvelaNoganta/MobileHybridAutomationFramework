@@ -22,6 +22,7 @@ public class ReportManager {
             extent.attachReporter(spark);
             extent.setSystemInfo("Platform", "Android");
             extent.setSystemInfo("Tester", "Avela");
+            extent.setSystemInfo("Browser", "Chrome");
             System.out.println("🧾 ExtentReports initialized at: " + reportPath);
         }
     }
